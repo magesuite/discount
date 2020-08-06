@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="catalog">
+            <group id="frontend">
+                <field id="minimal_sale_percentage" translate="label" type="text" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Minimal Sale Percentage</label>
+                    <comment>The discount badge will be visible only if discount is bigger than this value.</comment>
+                    <frontend_class>cs-csfeature__logo</frontend_class>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
