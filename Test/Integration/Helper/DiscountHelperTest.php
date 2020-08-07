@@ -6,7 +6,7 @@ namespace MageSuite\Discount\Test\Integration\Helper;
  * @magentoDbIsolation enabled
  * @magentoAppIsolation enabled
  */
-class DiscountHelper extends \PHPUnit\Framework\TestCase
+class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Magento\TestFramework\ObjectManager
