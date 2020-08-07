@@ -11,12 +11,16 @@ class Simple implements ProductResolverInterface
 
     public function getPrices($product, $finalPrice)
     {
-        if (!$finalPrice) {
-            $finalPrice = $product->getData('final_price') ? $product->getData('final_price') : $product->getFinalPrice();
+        if ($product->hasData('final_price') && $product->hasData('price')) {
+            $regularPrice = $product->getData('price');
+            $finalPrice = $finalPrice ?? $product->getData('final_price');
+        } else {
+            $regularPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)->getAmount()->getValue();
+            $finalPrice = $finalPrice ?? $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
         }
 
         return [
-            'regular_price' => $product->getData('price'),
+            'regular_price' => $regularPrice,
             'final_price' => $finalPrice
         ];
     }
