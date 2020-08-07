@@ -5,4 +5,12 @@
         <plugin name="add_price_data_to_collection" type="MageSuite\Discount\Plugin\Catalog\Block\Product\ListProduct\AddPriceDataToCollection" sortOrder="10" />
     </type>
 
+    <type name="Magento\Catalog\Pricing\Render\FinalPriceBox">
+        <plugin name="optimize_has_special_price" type="MageSuite\Discount\Plugin\Catalog\Pricing\Render\FinalPriceBox\OptimizeHasSpecialPriceMethod" sortOrder="10" />
+    </type>
+
+    <type name="Magento\ConfigurableProduct\Pricing\Render\FinalPriceBox">
+        <plugin name="optimize_has_special_price" type="MageSuite\Discount\Plugin\ConfigurableProduct\Pricing\Render\FinalPriceBox\OptimizeHasSpecialPriceMethod" sortOrder="10" />
+    </type>
+
 </config>

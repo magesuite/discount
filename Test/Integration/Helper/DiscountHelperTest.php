@@ -23,18 +23,12 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $discountHelper;
 
-    /**
-     * @var \Magento\Framework\App\ProductMetadataInterface
-     */
-    protected $magentoProductMetadata;
-
     public function setUp()
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->discountHelper = $this->objectManager->get(\MageSuite\Discount\Helper\Discount::class);
-        $this->magentoProductMetadata = $this->objectManager->get(\Magento\Framework\App\ProductMetadataInterface::class);
     }
 
     /**
@@ -99,22 +93,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $salePercentage);
     }
 
-    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice)
-    {
-        $product = $this->productRepository->get('sale_product');
-
-        $product->setSpecialPrice($specialPrice);
-        $product->setSpecialFromDate($specialPriceFrom);
-        $product->setSpecialToDate($specialPriceTo);
-        $product->setPrice($getPrice);
-        $product->save();
-
-        $product->reindex();
-        $product->priceReindexCallback();
-
-        return $product;
-    }
-
     /**
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
@@ -151,6 +129,22 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
             ['', null, null, 200, 100, 50, 75],
             [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, 100, 50, 75],
         ];
+    }
+
+    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice)
+    {
+        $product = $this->productRepository->get('sale_product');
+
+        $product->setSpecialPrice($specialPrice);
+        $product->setSpecialFromDate($specialPriceFrom);
+        $product->setSpecialToDate($specialPriceTo);
+        $product->setPrice($getPrice);
+        $product->save();
+
+        $product->reindex();
+        $product->priceReindexCallback();
+
+        return $product;
     }
 
     public static function loadSaleProductFixture()
