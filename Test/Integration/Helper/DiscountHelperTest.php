@@ -94,10 +94,26 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @magentoDbIsolation disabled
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture loadProduct
+     * @magentoDataFixture loadCatalogRule
+     */
+    public function testItReturnsCorrectSalePercentageForCatalogRule()
+    {
+        $productSku = 'product';
+        $product = $this->productRepository->get($productSku);
+
+        $salePercentage = $this->discountHelper->getSalePercentage($product);
+
+        $this->assertEquals(20, $salePercentage);
+    }
+
+    /**
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadSaleProductFixture
+     * @magentoDataFixture loadSaleProduct
      * @dataProvider getPercentage
      * @param $specialPrice
      * @param $specialPriceFrom
@@ -147,12 +163,12 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         return $product;
     }
 
-    public static function loadSaleProductFixture()
+    public static function loadSaleProduct()
     {
         require __DIR__ . '/../_files/sale_product.php';
     }
 
-    public static function loadSaleProductFixtureRollback()
+    public static function loadSaleProductRollback()
     {
         require __DIR__ . '/../_files/sale_product.php';
     }
@@ -170,5 +186,30 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public static function loadProductWithTax()
     {
         require __DIR__ . '/../_files/product_with_tax.php';
+    }
+
+    public static function loadProductWithTaxRollback()
+    {
+        require __DIR__ . '/../_files/product_with_tax_rollback.php';
+    }
+
+    public static function loadProduct()
+    {
+        require __DIR__ . '/../_files/product.php';
+    }
+
+    public static function loadProductRollback()
+    {
+        require __DIR__ . '/../_files/product_rollback.php';
+    }
+
+    public static function loadCatalogRule()
+    {
+        require __DIR__ . '/../_files/catalog_rule.php';
+    }
+
+    public static function loadCatalogRuleRollback()
+    {
+        require __DIR__ . '/../_files/catalog_rule_rollback.php';
     }
 }
