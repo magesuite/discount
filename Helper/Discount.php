@@ -14,6 +14,12 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $configuration;
 
+    /**
+     * Product Sku => salePercentage
+     * @var array
+     */
+    protected $cachedSalePercentage;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage,
@@ -27,17 +33,25 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function isOnSale($product, $finalPrice = null)
     {
-        $discount = $this->getSalePercentage->execute($product, $finalPrice);
+        $salePercentage = $this->getCachedSalePercentage($product->getSku()) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
-        return $discount > 0;
+        if ($salePercentage !== null) {
+            $this->setCachedSalePercentage($product->getSku(), $salePercentage);
+        }
+
+        return $salePercentage > 0;
     }
 
     public function getSalePercentage($product, $finalPrice = null)
     {
-        $discount = $this->getSalePercentage->execute($product, $finalPrice);
+        $salePercentage = $this->getCachedSalePercentage($product->getSku()) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
-        if ((int)$discount >= $this->configuration->getMinimalSalePercentage()) {
-            return $discount;
+        if ($salePercentage !== null) {
+            $this->setCachedSalePercentage($product->getSku(), $salePercentage);
+        }
+
+        if ((int)$salePercentage >= $this->configuration->getMinimalSalePercentage()) {
+            return $salePercentage;
         }
 
         return 0;
@@ -49,12 +63,17 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
             return [];
         }
 
+        $childrenProducts = $product->getChildrenWithPrices();
+
+        if (empty($childrenProducts)) {
+            $childrenProducts = $product->getTypeInstance()->getUsedProducts($product);
+        }
+
         $configurableDiscounts = [];
+        $maxConfigurablePrice = $product->getPriceInfo()->getPrice(\Magento\ConfigurableProduct\Pricing\Price\ConfigurableRegularPrice::PRICE_CODE)->getMaxRegularAmount()->getValue();
 
-        $simpleProducts = $product->getTypeInstance()->getUsedProducts($product);
-
-        foreach ($simpleProducts as $simpleProduct) {
-            $configurableDiscounts[$simpleProduct->getId()] = $this->getSalePercentage($simpleProduct);
+        foreach ($childrenProducts as $childProduct) {
+            $configurableDiscounts[$childProduct->getId()] = $this->getConfigurableChildProductDiscount($maxConfigurablePrice, $childProduct);
         }
 
         if (empty($configurableDiscounts)) {
@@ -62,5 +81,30 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $configurableDiscounts;
+    }
+
+    protected function getConfigurableChildProductDiscount($maxConfigurablePrice, $childProduct)
+    {
+        //ensure product has correct prices for configurable item
+        $childProductPrice = $childProduct->getData('final_price') ?? $childProduct->getFinalPrice();
+
+        $childProduct->setData('price', $maxConfigurablePrice);
+        $childProduct->setData('final_price', $childProductPrice);
+
+        return $this->getSalePercentage($childProduct);
+    }
+
+    protected function getCachedSalePercentage($productSku)
+    {
+        if (!isset($this->cachedSalePercentage[$productSku])) {
+            return null;
+        }
+
+        return $this->cachedSalePercentage[$productSku];
+    }
+
+    protected function setCachedSalePercentage($productSku, $salePercentage)
+    {
+        $this->cachedSalePercentage[$productSku] = $salePercentage;
     }
 }

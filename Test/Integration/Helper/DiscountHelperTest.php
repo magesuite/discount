@@ -19,16 +19,29 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     protected $productRepository;
 
     /**
-     * @var \MageSuite\Discount\Helper\Discount
+     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    protected $discountHelper;
+    protected $productCollectionFactory;
+
+    /**
+     * @var \Magento\Catalog\Model\Config
+     */
+    protected $catalogConfig;
+
+    /**
+     * @var \MageSuite\Discount\Helper\DiscountFactory
+     */
+    protected $discountHelperFactory;
 
     public function setUp()
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
-        $this->discountHelper = $this->objectManager->get(\MageSuite\Discount\Helper\Discount::class);
+        $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+        $this->catalogConfig = $this->objectManager->create(\Magento\Catalog\Model\Config::class);
+
+        $this->discountHelperFactory = $this->objectManager->get(\MageSuite\Discount\Helper\DiscountFactory::class);
     }
 
     /**
@@ -40,24 +53,29 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public function testItReturnsCorrectDataForConfigurableProducts()
     {
         $configurableProductSku = 'configurable';
-        $configurableProduct = $this->productRepository->get($configurableProductSku);
 
-        $this->itReturnsCorrectConfigurableDiscounts($configurableProduct);
-        $this->itReturnsCorrectSalePercentage($configurableProduct);
+        $productFromRepository = $this->getFromRepository($configurableProductSku);
+        $productFromCollection = $this->getFromCollection($configurableProductSku);
+
+        $this->itReturnsCorrectConfigurableDiscounts($productFromRepository);
+        $this->itReturnsCorrectSalePercentage($productFromRepository);
+
+        $this->itReturnsCorrectConfigurableDiscounts($productFromCollection);
+        $this->itReturnsCorrectSalePercentage($productFromCollection);
     }
 
     protected function itReturnsCorrectConfigurableDiscounts($configurableProduct)
     {
-        $configurableDiscounts = $this->discountHelper->getConfigurableDiscounts($configurableProduct);
+        $configurableDiscounts = $this->getDiscountHelper()->getConfigurableDiscounts($configurableProduct);
 
-        $this->assertEquals([10 => 90, 20 => 68], $configurableDiscounts);
+        $this->assertEquals([10 => 95, 20 => 68], $configurableDiscounts);
     }
 
     protected function itReturnsCorrectSalePercentage($configurableProduct)
     {
-        $salePercentage = $this->discountHelper->getSalePercentage($configurableProduct);
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($configurableProduct);
 
-        $this->assertEquals(90, $salePercentage);
+        $this->assertEquals(95, $salePercentage);
     }
 
     /**
@@ -69,10 +87,14 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public function testItReturnsCorrectSalePercentageForBundleProduct()
     {
         $bundleProductSku = 'bundle-product';
-        $bundleProduct = $this->productRepository->get($bundleProductSku);
 
-        $salePercentage = $this->discountHelper->getSalePercentage($bundleProduct);
+        $productFromRepository = $this->getFromRepository($bundleProductSku);
+        $productFromCollection = $this->getFromCollection($bundleProductSku);
 
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromRepository);
+        $this->assertEquals(65, $salePercentage);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromCollection);
         $this->assertEquals(65, $salePercentage);
     }
 
@@ -86,10 +108,14 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public function testItReturnsCorrectSalePercentageForProductWithTax()
     {
         $productWithTaxSku = 'product_with_tax';
-        $productWithTax = $this->productRepository->get($productWithTaxSku);
 
-        $salePercentage = $this->discountHelper->getSalePercentage($productWithTax);
+        $productFromRepository = $this->getFromRepository($productWithTaxSku);
+        $productFromCollection = $this->getFromCollection($productWithTaxSku);
 
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromRepository);
+        $this->assertEquals(50, $salePercentage);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromCollection);
         $this->assertEquals(50, $salePercentage);
     }
 
@@ -102,10 +128,14 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public function testItReturnsCorrectSalePercentageForCatalogRule()
     {
         $productSku = 'product';
-        $product = $this->productRepository->get($productSku);
 
-        $salePercentage = $this->discountHelper->getSalePercentage($product);
+        $productFromRepository = $this->getFromRepository($productSku);
+        $productFromCollection = $this->getFromCollection($productSku);
 
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromRepository);
+        $this->assertEquals(20, $salePercentage);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromCollection);
         $this->assertEquals(20, $salePercentage);
     }
 
@@ -127,7 +157,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     {
         $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice);
 
-        $this->assertEquals($expected, $this->discountHelper->getSalePercentage($productStub, $customFinalPrice));
+        $this->assertEquals($expected, $this->getDiscountHelper()->getSalePercentage($productStub, $customFinalPrice));
     }
 
     public function getPercentage()
@@ -161,6 +191,27 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $product->priceReindexCallback();
 
         return $product;
+    }
+
+    protected function getFromRepository($productSku)
+    {
+        return $this->productRepository->get($productSku);
+    }
+
+    protected function getFromCollection($productSku)
+    {
+        $collection = $this->productCollectionFactory->create();
+
+        return $collection
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+            ->addFieldToFilter('sku', $productSku)
+            ->addPriceData()
+            ->getFirstItem();
+    }
+
+    protected function getDiscountHelper()
+    {
+        return $this->discountHelperFactory->create();
     }
 
     public static function loadSaleProduct()

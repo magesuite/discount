@@ -5,25 +5,30 @@ namespace MageSuite\Discount\Service;
 class ProductPriceResolver implements \MageSuite\Discount\Api\ProductPriceResolverInterface
 {
     /**
-     * @var \MageSuite\Discount\Model\ProductResolverPool
+     * @var \MageSuite\Discount\Model\ProductPriceResolverPool
      */
-    protected $productResolverPool;
+    protected $productPriceResolverPool;
 
-    public function __construct(\MageSuite\Discount\Model\ProductResolverPool $productResolverPool)
-    {
-        $this->productResolverPool = $productResolverPool;
+    /**
+     * @var \MageSuite\Discount\Api\Data\ProductPricesInterfaceFactory
+     */
+    protected $productPricesFactory;
+
+    public function __construct(
+        \MageSuite\Discount\Model\ProductPriceResolverPool $productPriceResolverPool,
+        \MageSuite\Discount\Api\Data\ProductPricesInterfaceFactory $productPricesFactory
+    ) {
+        $this->productPriceResolverPool = $productPriceResolverPool;
+        $this->productPricesFactory = $productPricesFactory;
     }
     public function getPrices($product, $finalPrice)
     {
-        $productResolver = $this->productResolverPool->getProductResolver($product->getTypeId());
+        $productPriceResolver = $this->productPriceResolverPool->getProductPriceResolver($product->getTypeId());
 
-        if (!$productResolver) {
-            return [
-                'regular_price' => 0,
-                'final_price' => 0
-            ];
+        if (!$productPriceResolver) {
+            return $this->productPricesFactory->create();
         }
 
-        return $productResolver->getPrices($product, $finalPrice);
+        return $productPriceResolver->getPrices($product, $finalPrice);
     }
 }

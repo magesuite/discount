@@ -1,8 +1,8 @@
 <?php
 
-namespace MageSuite\Discount\Model\ProductResolver;
+namespace MageSuite\Discount\Model\ProductPriceResolver;
 
-class Simple implements ProductResolverInterface
+class Simple extends ProductPriceResolver implements ProductPriceResolverInterface
 {
     public function isApplicable($productTypeId)
     {
@@ -19,9 +19,12 @@ class Simple implements ProductResolverInterface
             $finalPrice = $finalPrice ?? $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
         }
 
-        return [
-            'regular_price' => $regularPrice,
-            'final_price' => $finalPrice
-        ];
+        $productPricesContainer = $this->getProductPricesContainer();
+
+        $productPricesContainer
+            ->setRegularPrice($regularPrice)
+            ->setFinalPrice($finalPrice);
+
+        return $productPricesContainer;
     }
 }

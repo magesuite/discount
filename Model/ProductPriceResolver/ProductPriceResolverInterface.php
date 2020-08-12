@@ -1,8 +1,8 @@
 <?php
 
-namespace MageSuite\Discount\Model\ProductResolver;
+namespace MageSuite\Discount\Model\ProductPriceResolver;
 
-interface ProductResolverInterface
+interface ProductPriceResolverInterface
 {
     /**
      * @param string $productTypeId
