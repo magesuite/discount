@@ -15,6 +15,11 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
     protected $configuration;
 
     /**
+     * @var \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct
+     */
+    protected $getMaxPriceForConfigurableProduct;
+
+    /**
      * Product Sku => salePercentage
      * @var array
      */
@@ -23,12 +28,14 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage,
-        \MageSuite\Discount\Helper\Configuration $configuration
+        \MageSuite\Discount\Helper\Configuration $configuration,
+        \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct
     ) {
         parent::__construct($context);
 
         $this->getSalePercentage = $getSalePercentage;
         $this->configuration = $configuration;
+        $this->getMaxPriceForConfigurableProduct = $getMaxPriceForConfigurableProduct;
     }
 
     public function isOnSale($product, $finalPrice = null)
@@ -70,7 +77,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $configurableDiscounts = [];
-        $maxConfigurablePrice = $product->getPriceInfo()->getPrice(\Magento\ConfigurableProduct\Pricing\Price\ConfigurableRegularPrice::PRICE_CODE)->getMaxRegularAmount()->getValue();
+        $maxConfigurablePrice = $this->getMaxPriceForConfigurableProduct->execute($product);
 
         foreach ($childrenProducts as $childProduct) {
             $configurableDiscounts[$childProduct->getId()] = $this->getConfigurableChildProductDiscount($maxConfigurablePrice, $childProduct);

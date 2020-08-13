@@ -45,6 +45,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
@@ -205,7 +206,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         return $collection
             ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
             ->addFieldToFilter('sku', $productSku)
-            ->addPriceData()
             ->getFirstItem();
     }
 

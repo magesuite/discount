@@ -29,7 +29,7 @@ class PreloadChildrenWithPrices
         $this->productCollectionFactory = $productCollectionFactory;
     }
 
-    public function afterGetItems(\Magento\Catalog\Model\ResourceModel\Product\Collection $subject, $result)
+    public function afterLoad(\Magento\Catalog\Model\ResourceModel\Product\Collection $subject, $result)
     {
         if ($subject->hasFlag('children_with_prices_preloaded')) {
             return $result;
