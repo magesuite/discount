@@ -40,10 +40,10 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function isOnSale($product, $finalPrice = null)
     {
-        $salePercentage = $this->getCachedSalePercentage($product->getSku()) ?? $this->getSalePercentage->execute($product, $finalPrice);
+        $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
         if ($salePercentage !== null) {
-            $this->setCachedSalePercentage($product->getSku(), $salePercentage);
+            $this->setCachedSalePercentage($product->getSku(), $finalPrice, $salePercentage);
         }
 
         return $salePercentage > 0;
@@ -51,10 +51,10 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getSalePercentage($product, $finalPrice = null)
     {
-        $salePercentage = $this->getCachedSalePercentage($product->getSku()) ?? $this->getSalePercentage->execute($product, $finalPrice);
+        $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
         if ($salePercentage !== null) {
-            $this->setCachedSalePercentage($product->getSku(), $salePercentage);
+            $this->setCachedSalePercentage($product->getSku(), $finalPrice, $salePercentage);
         }
 
         if ((int)$salePercentage >= $this->configuration->getMinimalSalePercentage()) {
@@ -101,17 +101,25 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getSalePercentage($childProduct);
     }
 
-    protected function getCachedSalePercentage($productSku)
+    protected function getCachedSalePercentage($productSku, $finalPrice)
     {
         if (!isset($this->cachedSalePercentage[$productSku])) {
             return null;
         }
 
+        if ($finalPrice) {
+            return $this->cachedSalePercentage[$productSku][$finalPrice] ?? null;
+        }
+
         return $this->cachedSalePercentage[$productSku];
     }
 
-    protected function setCachedSalePercentage($productSku, $salePercentage)
+    protected function setCachedSalePercentage($productSku, $finalPrice, $salePercentage)
     {
-        $this->cachedSalePercentage[$productSku] = $salePercentage;
+        if ($finalPrice) {
+            $this->cachedSalePercentage[$productSku][$finalPrice] = $salePercentage;
+        } else {
+            $this->cachedSalePercentage[$productSku] = $salePercentage;
+        }
     }
 }
