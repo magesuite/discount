@@ -111,7 +111,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->cachedSalePercentage[$productSku][$finalPrice] ?? null;
         }
 
-        return $this->cachedSalePercentage[$productSku];
+        return $this->cachedSalePercentage[$productSku]['default'];
     }
 
     protected function setCachedSalePercentage($productSku, $finalPrice, $salePercentage)
@@ -119,7 +119,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         if ($finalPrice) {
             $this->cachedSalePercentage[$productSku][$finalPrice] = $salePercentage;
         } else {
-            $this->cachedSalePercentage[$productSku] = $salePercentage;
+            $this->cachedSalePercentage[$productSku]['default'] = $salePercentage;
         }
     }
 }
