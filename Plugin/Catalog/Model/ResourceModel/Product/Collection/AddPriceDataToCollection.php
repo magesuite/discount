@@ -7,8 +7,9 @@ class AddPriceDataToCollection
     public function beforeLoad(\Magento\Catalog\Model\ResourceModel\Product\Collection $subject, $printQuery = false, $logQuery = false)
     {
         $isUsingPriceIndex = $subject->getLimitationFilters()->isUsingPriceIndex();
+        $storeId = $subject->getStoreId();
 
-        if (!$isUsingPriceIndex) {
+        if ($storeId && !$isUsingPriceIndex) {
             $subject->addPriceData();
         }
 
