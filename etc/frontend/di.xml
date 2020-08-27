@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
     <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
-        <plugin name="add_price_data_to_collection" type="MageSuite\Discount\Plugin\Catalog\Model\ResourceModel\Product\Collection\AddPriceDataToCollection" sortOrder="10" />
+        <plugin name="add_price_data_to_collection" type="MageSuite\Discount\Plugin\Catalog\Block\Product\ListProduct\AddPriceDataToCollection" sortOrder="10" />
     </type>
 
     <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
