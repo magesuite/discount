@@ -11,7 +11,7 @@ class Simple extends ProductPriceResolver implements ProductPriceResolverInterfa
 
     public function getPrices($product, $finalPrice)
     {
-        if ($product->hasData('final_price') && $product->hasData('price')) {
+        if ($product->hasData('final_price') && $product->getData('final_price') && $product->hasData('price')) {
             $regularPrice = $product->getData('price');
             $finalPrice = $finalPrice ?? $product->getData('final_price');
         } else {
