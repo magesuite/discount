@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="MageSuite\Discount\Api\ProductPriceResolverInterface" type="MageSuite\Discount\Service\ProductPriceResolver" />
+    <preference for="MageSuite\Discount\Api\Data\ProductPricesInterface" type="MageSuite\Discount\Model\Data\ProductPrices" />
+
+    <type name="MageSuite\Discount\Model\ProductPriceResolverPool">
+        <arguments>
+            <argument name="productPriceResolvers" xsi:type="array">
+                <item name="bundle" xsi:type="object">\MageSuite\Discount\Model\ProductPriceResolver\Bundle</item>
+                <item name="configurable" xsi:type="object">\MageSuite\Discount\Model\ProductPriceResolver\Configurable</item>
+                <item name="grouped" xsi:type="object">\MageSuite\Discount\Model\ProductPriceResolver\Grouped</item>
+                <item name="simple" xsi:type="object">\MageSuite\Discount\Model\ProductPriceResolver\Simple</item>
+                <item name="virtual" xsi:type="object">\MageSuite\Discount\Model\ProductPriceResolver\Virtual</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

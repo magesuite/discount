@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="add_price_data_to_collection" type="MageSuite\Discount\Plugin\Catalog\Block\Product\ListProduct\AddPriceDataToCollection" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="preload_children_with_prices_for_configurable_products" type="MageSuite\Discount\Plugin\Catalog\Model\ResourceModel\Product\Collection\PreloadChildrenWithPrices" sortOrder="20" />
+    </type>
+
+    <type name="Magento\Catalog\Pricing\Render\FinalPriceBox">
+        <plugin name="optimize_has_special_price" type="MageSuite\Discount\Plugin\Catalog\Pricing\Render\FinalPriceBox\OptimizeHasSpecialPriceMethod" sortOrder="10" />
+    </type>
+
+    <type name="Magento\ConfigurableProduct\Pricing\Render\FinalPriceBox">
+        <plugin name="optimize_has_special_price" type="MageSuite\Discount\Plugin\ConfigurableProduct\Pricing\Render\FinalPriceBox\OptimizeHasSpecialPriceMethod" sortOrder="10" />
+    </type>
+
+</config>
