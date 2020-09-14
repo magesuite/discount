@@ -23,7 +23,7 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
      */
     protected $productView;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
@@ -59,8 +59,11 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
 
         $priceHtml = $this->getPriceHtmlForProduct($configurableProduct);
 
-        $this->assertContains('data-price-type="finalPrice', $priceHtml);
-        $this->assertNotContains('data-price-type="oldPrice"', $priceHtml);
+        $assertContains = method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';
+        $assertNotContains = method_exists($this, 'assertStringNotContainsString') ? 'assertStringNotContainsString' : 'assertNotContains';
+
+        $this->$assertContains('data-price-type="finalPrice', $priceHtml);
+        $this->$assertNotContains('data-price-type="oldPrice"', $priceHtml);
     }
 
     /**
@@ -76,8 +79,10 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
 
         $priceHtml = $this->getPriceHtmlForProduct($configurableProduct);
 
-        $this->assertContains('data-price-type="finalPrice', $priceHtml);
-        $this->assertContains('data-price-type="oldPrice"', $priceHtml);
+        $assertContains = method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';
+
+        $this->$assertContains('data-price-type="finalPrice', $priceHtml);
+        $this->$assertContains('data-price-type="oldPrice"', $priceHtml);
     }
 
     /**
@@ -92,8 +97,10 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
 
         $priceHtml = $this->getPriceHtmlForProduct($product);
 
-        $this->assertContains('data-price-type="finalPrice', $priceHtml);
-        $this->assertContains('data-price-type="oldPrice"', $priceHtml);
+        $assertContains = method_exists($this, 'assertStringContainsString') ? 'assertStringContainsString' : 'assertContains';
+
+        $this->$assertContains('data-price-type="finalPrice', $priceHtml);
+        $this->$assertContains('data-price-type="oldPrice"', $priceHtml);
     }
 
     protected function getPriceHtmlForProduct($product)

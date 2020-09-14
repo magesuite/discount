@@ -33,7 +33,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $discountHelperFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 

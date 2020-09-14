@@ -18,7 +18,7 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      */
     protected $productCollectionFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
