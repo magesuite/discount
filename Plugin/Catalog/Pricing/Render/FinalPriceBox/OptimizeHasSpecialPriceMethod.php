@@ -8,7 +8,9 @@ class OptimizeHasSpecialPriceMethod
     {
         $product = $subject->getSaleableItem();
 
-        if ($product->hasData('price') && $product->hasData('final_price')) {
+        if ($product->hasData('price') && $product->hasData('final_price') &&
+            (float)$product->getData('price') && (float)$product->getData('final_price')
+        ) {
             return $product->getData('final_price') < $product->getData('price');
         }
 
