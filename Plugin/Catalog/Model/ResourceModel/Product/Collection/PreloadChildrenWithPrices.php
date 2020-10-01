@@ -134,6 +134,7 @@ class PreloadChildrenWithPrices
 
         return $collection
             ->addFieldToFilter($this->optionProvider->getProductEntityLinkField(), ['in' => $productIds])
+            ->setFlag('children_with_prices_preloaded', true)
             ->addPriceData()
             ->load();
     }
