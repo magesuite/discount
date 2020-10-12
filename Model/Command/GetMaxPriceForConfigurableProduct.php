@@ -31,6 +31,12 @@ class GetMaxPriceForConfigurableProduct
 
     protected function getMaxPriceFromPriceInfoModel($product)
     {
-        return $product->getPriceInfo()->getPrice(\Magento\ConfigurableProduct\Pricing\Price\ConfigurableRegularPrice::PRICE_CODE)->getMaxRegularAmount()->getValue();
+        $maxRegularAmount = $product->getPriceInfo()->getPrice(\Magento\ConfigurableProduct\Pricing\Price\ConfigurableRegularPrice::PRICE_CODE)->getMaxRegularAmount();
+
+        if (!$maxRegularAmount) {
+            return null;
+        }
+
+        return $maxRegularAmount->getValue();
     }
 }
