@@ -9,9 +9,17 @@ class ProductPriceResolver
      */
     protected $productPricesFactory;
 
-    public function __construct(\MageSuite\Discount\Api\Data\ProductPricesInterfaceFactory $productPricesFactory)
-    {
+    /**
+     * @var \MageSuite\Discount\Helper\Configuration
+     */
+    protected $configuration;
+
+    public function __construct(
+        \MageSuite\Discount\Api\Data\ProductPricesInterfaceFactory $productPricesFactory,
+        \MageSuite\Discount\Helper\Configuration $configuration
+    ) {
         $this->productPricesFactory = $productPricesFactory;
+        $this->configuration = $configuration;
     }
 
     /**

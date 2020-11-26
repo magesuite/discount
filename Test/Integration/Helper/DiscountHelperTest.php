@@ -144,6 +144,63 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture loadConfigurableProduct
+     */
+    public function testCorrectFinalPriceFromChildrenSpecialPrice()
+    {
+        $productSku = 'configurable';
+        $product = $this->getFromRepository($productSku);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($product);
+        $this->assertEquals(95, $salePercentage);
+    }
+
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     */
+    public function testCorrectFinalPriceFromChildrenWithoutSpecialPrice()
+    {
+        $productSku = 'configurable';
+        $product = $this->getFromRepository($productSku);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($product);
+
+        $this->assertEquals(0, $salePercentage);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
+     * @magentoDataFixture loadProduct
+     * @magentoDataFixture loadProductWithTax
+     */
+    public function testSalePercentageSimpleProductsWithSpecialPriceResolver()
+    {
+        $productSku = 'product';
+        $productTaxSku = 'product_with_tax';
+        $product = $this->getFromRepository($productSku);
+        $productTax = $this->getFromRepository($productTaxSku);
+
+        $salePercentageNoSpecialPrice = $this->getDiscountHelper()->getSalePercentage($product);
+        $salePercentageWithSpecialPrice = $this->getDiscountHelper()->getSalePercentage($productTax);
+
+        $this->assertEquals(0, $salePercentageNoSpecialPrice);
+        $this->assertEquals(50, $salePercentageWithSpecialPrice);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
      * @magentoDataFixture loadSaleProduct
      * @dataProvider getPercentage
      * @param $specialPrice

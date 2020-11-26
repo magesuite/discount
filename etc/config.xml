@@ -5,6 +5,7 @@
         <catalog>
             <frontend>
                 <minimal_sale_percentage>5</minimal_sale_percentage>
+                <is_special_price_resolver_enabled>0</is_special_price_resolver_enabled>
             </frontend>
         </catalog>
     </default>
