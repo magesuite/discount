@@ -8,6 +8,11 @@
                     <comment>The discount badge will be visible only if discount is bigger than this value.</comment>
                     <frontend_class>cs-csfeature__logo</frontend_class>
                 </field>
+                <field id="is_special_price_resolver_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sale badge visibility on frontend calculated from Special Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When this option is set to "Yes" then product badges visibility will be calculated from Special Price.</comment>
+                </field>
             </group>
         </section>
     </system>
