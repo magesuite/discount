@@ -51,6 +51,13 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getSalePercentage($product, $finalPrice = null)
     {
+        if (
+            $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE &&
+            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE
+        ) {
+            return $this->getBiggestConfigurationSalePercentage($product);
+        }
+
         $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
         if ($salePercentage !== null) {
@@ -94,8 +101,9 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
     {
         //ensure product has correct prices for configurable item
         $childProductPrice = $childProduct->getData('final_price') ?? $childProduct->getFinalPrice();
-
-        $childProduct->setData('price', $maxConfigurablePrice);
+        if ($this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_CHEAPEST_SIMPLE_TO_MOST_EXPENSIVE_REGULAR) {
+            $childProduct->setData('price', $maxConfigurablePrice);
+        }
         $childProduct->setData('final_price', $childProductPrice);
 
         return $this->getSalePercentage($childProduct);
@@ -121,5 +129,10 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         } else {
             $this->cachedSalePercentage[$productSku]['default'] = $salePercentage;
         }
+    }
+
+    protected function getBiggestConfigurationSalePercentage($product)
+    {
+        return max($this->getConfigurableDiscounts($product));
     }
 }
