@@ -201,6 +201,42 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture loadConfigurableProduct
+     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
+     */
+    public function testItReturnsCorrectDataForConfigurableProductsWithAlternativeDiscountCalculationType()
+    {
+        $configurableProductSku = 'configurable';
+
+        $productFromRepository = $this->getFromRepository($configurableProductSku);
+        $productFromCollection = $this->getFromCollection($configurableProductSku);
+
+        $this->itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($productFromRepository);
+        $this->itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($productFromRepository);
+
+        $this->itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($productFromCollection);
+        $this->itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($productFromCollection);
+    }
+
+    protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
+    {
+        $configurableDiscounts = $this->getDiscountHelper()->getConfigurableDiscounts($configurableProduct);
+
+        $this->assertEquals([10 => 90, 20 => 68], $configurableDiscounts);
+    }
+
+    protected function itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($configurableProduct)
+    {
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($configurableProduct);
+
+        $this->assertEquals(90, $salePercentage);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
      * @magentoDataFixture loadSaleProduct
      * @dataProvider getPercentage
      * @param $specialPrice
