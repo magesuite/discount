@@ -6,6 +6,7 @@
             <frontend>
                 <minimal_sale_percentage>5</minimal_sale_percentage>
                 <is_special_price_resolver_enabled>0</is_special_price_resolver_enabled>
+                <sale_percentage_calculation_type>cheapest_simple_special_to_most_expensive_regular</sale_percentage_calculation_type>
             </frontend>
         </catalog>
     </default>
