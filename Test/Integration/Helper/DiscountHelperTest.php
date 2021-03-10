@@ -14,6 +14,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     protected $objectManager;
 
     /**
+     * @var \Magento\Catalog\Model\Product
+     */
+    protected $product;
+
+    /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
     protected $productRepository;
@@ -37,6 +42,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
+        $this->product = $this->objectManager->create(\Magento\Catalog\Model\Product::class);
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->catalogConfig = $this->objectManager->create(\Magento\Catalog\Model\Config::class);
@@ -67,9 +73,14 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function itReturnsCorrectConfigurableDiscounts($configurableProduct)
     {
+        $expectedResult = [
+            $this->product->getIdBySku('simple_10') => 95,
+            $this->product->getIdBySku('simple_20') => 68
+        ];
+
         $configurableDiscounts = $this->getDiscountHelper()->getConfigurableDiscounts($configurableProduct);
 
-        $this->assertEquals([10 => 95, 20 => 68], $configurableDiscounts);
+        $this->assertEquals($expectedResult, $configurableDiscounts);
     }
 
     protected function itReturnsCorrectSalePercentage($configurableProduct)
@@ -221,9 +232,14 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
     {
+        $expectedResult = [
+            $this->product->getIdBySku('simple_10') => 90,
+            $this->product->getIdBySku('simple_20') => 68
+        ];
+
         $configurableDiscounts = $this->getDiscountHelper()->getConfigurableDiscounts($configurableProduct);
 
-        $this->assertEquals([10 => 90, 20 => 68], $configurableDiscounts);
+        $this->assertEquals($expectedResult, $configurableDiscounts);
     }
 
     protected function itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($configurableProduct)
