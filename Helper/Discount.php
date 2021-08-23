@@ -49,11 +49,12 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $salePercentage > 0;
     }
 
-    public function getSalePercentage($product, $finalPrice = null)
+    public function getSalePercentage($product, $finalPrice = null, $isOutOfStock = false)
     {
         if (
             $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE &&
-            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE
+            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE &&
+            !$isOutOfStock
         ) {
             return $this->getBiggestConfigurationSalePercentage($product);
         }
@@ -91,7 +92,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if (empty($configurableDiscounts)) {
-            $configurableDiscounts[$product->getId()] = $this->getSalePercentage($product);
+            $configurableDiscounts[$product->getId()] = $this->getSalePercentage($product, null, true);
         }
 
         return $configurableDiscounts;
