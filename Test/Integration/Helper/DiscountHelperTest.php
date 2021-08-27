@@ -245,7 +245,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $product = $this->getFromRepository($configurableProductSku);
 
         $discountHelper = $this->discountHelperFactory->create();
-        $discountHelper->getSalePercentage($product);
+        $this->assertEquals(0, $discountHelper->getSalePercentage($product));
     }
 
     protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
