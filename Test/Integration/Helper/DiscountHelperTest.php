@@ -230,6 +230,24 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($productFromCollection);
     }
 
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture loadConfigurableProductOutOfStock
+     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
+     * @magentoConfigFixture current_store cataloginventory/options/show_out_of_stock 0
+     */
+    public function testItWorksWithOutOfStockConfigurableProducts()
+    {
+        $configurableProductSku = 'configurable';
+        $product = $this->getFromRepository($configurableProductSku);
+
+        $discountHelper = $this->discountHelperFactory->create();
+        $this->assertEquals(0, $discountHelper->getSalePercentage($product));
+    }
+
     protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
     {
         $expectedResult = [
@@ -337,6 +355,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     public static function loadConfigurableProduct()
     {
         require __DIR__ . '/../_files/configurable_product.php';
+    }
+
+    public static function loadConfigurableProductOutOfStock()
+    {
+        require __DIR__ . '/../_files/configurable_product_out_of_stock.php';
     }
 
     public static function loadBundleProduct()
