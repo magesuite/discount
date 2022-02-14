@@ -11,17 +11,15 @@ class Grouped extends ProductPriceResolver implements ProductPriceResolverInterf
 
     public function getPrices($product, $finalPrice)
     {
+        $productPricesContainer = $this->getProductPricesContainer();
         $minProduct = $product->getPriceInfo()->getPrice(\Magento\GroupedProduct\Pricing\Price\FinalPrice::PRICE_CODE)->getMinProduct();
 
-        if (!$finalPrice && $minProduct !== null) {
+        if (!$finalPrice && $minProduct instanceof \Magento\Catalog\Api\Data\ProductInterface) {
             $finalPrice = $minProduct->getData('final_price') ? $minProduct->getData('final_price') : $minProduct->getFinalPrice();
+            $productPricesContainer->setRegularPrice($minProduct->getPrice());
         }
 
-        $productPricesContainer = $this->getProductPricesContainer();
-
-        $productPricesContainer
-            ->setRegularPrice($minProduct ? $minProduct->getData('price') : null)
-            ->setFinalPrice($finalPrice);
+        $productPricesContainer->setFinalPrice($finalPrice);
 
         return $productPricesContainer;
     }
