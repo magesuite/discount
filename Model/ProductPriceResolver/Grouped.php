@@ -15,7 +15,7 @@ class Grouped extends ProductPriceResolver implements ProductPriceResolverInterf
         $minProduct = $product->getPriceInfo()->getPrice(\Magento\GroupedProduct\Pricing\Price\FinalPrice::PRICE_CODE)->getMinProduct();
 
         if (!$finalPrice && $minProduct instanceof \Magento\Catalog\Api\Data\ProductInterface) {
-            $finalPrice = $minProduct->getData('final_price') ? $minProduct->getData('final_price') : $minProduct->getFinalPrice();
+            $finalPrice = $minProduct->getFinalPrice();
             $productPricesContainer->setRegularPrice($minProduct->getPrice());
         }
 
