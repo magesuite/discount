@@ -34,6 +34,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     protected $catalogConfig;
 
     /**
+     * @var \Magento\Catalog\Model\ProductFrontendAction
+     */
+    protected $productFrontendAction;
+
+    /**
      * @var \MageSuite\Discount\Helper\DiscountFactory
      */
     protected $discountHelperFactory;
@@ -46,6 +51,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->catalogConfig = $this->objectManager->create(\Magento\Catalog\Model\Config::class);
+        $this->productFrontendAction = $this->objectManager->create( \Magento\Catalog\Model\ProductFrontendAction::class);
 
         $this->discountHelperFactory = $this->objectManager->get(\MageSuite\Discount\Helper\DiscountFactory::class);
     }
@@ -246,6 +252,21 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
         $discountHelper = $this->discountHelperFactory->create();
         $this->assertEquals(0, $discountHelper->getSalePercentage($product));
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
+     */
+    public function testSalePercentageReturnsZeroInsteadOfError()
+    {
+        $this->productFrontendAction->setTypeId(\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE);
+
+        $discountHelper = $this->discountHelperFactory->create();
+        $this->assertEquals(0, $discountHelper->getSalePercentage($this->productFrontendAction));
     }
 
     protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
