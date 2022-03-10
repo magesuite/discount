@@ -349,7 +349,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
     public static function loadSaleProductRollback()
     {
-        require __DIR__ . '/../_files/sale_product.php';
+        require __DIR__ . '/../_files/sale_product_rollback.php';
     }
 
     public static function loadConfigurableProduct()
