@@ -134,6 +134,11 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function getBiggestConfigurationSalePercentage($product)
     {
-        return max($this->getConfigurableDiscounts($product));
+        $discounts = $this->getConfigurableDiscounts($product);
+        if (!empty($discounts)) {
+            return max($discounts);
+        }
+
+        return 0;
     }
 }
