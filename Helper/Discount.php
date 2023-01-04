@@ -4,41 +4,32 @@ namespace MageSuite\Discount\Helper;
 
 class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    /**
-     * @var \MageSuite\Discount\Model\Command\GetSalePercentage
-     */
-    protected $getSalePercentage;
-
-    /**
-     * @var \MageSuite\Discount\Helper\Configuration
-     */
-    protected $configuration;
-
-    /**
-     * @var \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct
-     */
-    protected $getMaxPriceForConfigurableProduct;
+    protected \MageSuite\Discount\Helper\Configuration $configuration;
+    protected \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct;
+    protected \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage;
+    protected \MageSuite\Discount\Model\Container\ProductPriceData $container;
 
     /**
      * Product Sku => salePercentage
-     * @var array
      */
-    protected $cachedSalePercentage;
+    protected array $cachedSalePercentage;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage,
         \MageSuite\Discount\Helper\Configuration $configuration,
-        \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct
+        \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct,
+        \MageSuite\Discount\Model\Container\ProductPriceData $container
     ) {
         parent::__construct($context);
 
         $this->getSalePercentage = $getSalePercentage;
         $this->configuration = $configuration;
         $this->getMaxPriceForConfigurableProduct = $getMaxPriceForConfigurableProduct;
+        $this->container = $container;
     }
 
-    public function isOnSale($product, $finalPrice = null)
+    public function isOnSale($product, $finalPrice = null): bool
     {
         $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
@@ -72,17 +63,19 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return 0;
     }
 
-    public function getConfigurableDiscounts($product)
+    public function getConfigurableDiscounts($product): array
     {
         if (!$product instanceof \Magento\Catalog\Api\Data\ProductInterface || $product->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
             return [];
         }
 
-        $childrenProducts = $product->getChildrenWithPrices();
+        $childrenProducts = $this->getChildrenProducts($product);
 
-        if (empty($childrenProducts)) {
-            $childrenProducts = $product->getTypeInstance()->getUsedProducts($product);
-        }
+        $productIds = array_map(function ($product) {
+            return (int)$product->getId();
+        }, $childrenProducts);
+
+        $this->container->initProducts($productIds);
 
         $configurableDiscounts = [];
         $maxConfigurablePrice = $this->getMaxPriceForConfigurableProduct->execute($product);
@@ -96,6 +89,17 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $configurableDiscounts;
+    }
+
+    protected function getChildrenProducts(\Magento\Catalog\Api\Data\ProductInterface $product): array
+    {
+        $childrenProducts = $product->getChildrenWithPrices();
+
+        if (!empty($childrenProducts)) {
+            return $childrenProducts;
+        }
+
+        return $product->getTypeInstance()->getUsedProducts($product);
     }
 
     protected function getConfigurableChildProductDiscount($maxConfigurablePrice, $childProduct)

@@ -13,4 +13,7 @@
         <plugin name="optimize_has_special_price" type="MageSuite\Discount\Plugin\Catalog\Pricing\Render\FinalPriceBox\OptimizeHasSpecialPriceMethod" sortOrder="10" />
     </type>
 
+    <type name="Magento\CatalogRule\Model\ResourceModel\Rule">
+        <plugin name="get_data_from_container" type="MageSuite\Discount\Plugin\CatalogRule\Model\ResourceModel\Rule\GetDataFromContainer" sortOrder="100"/>
+    </type>
 </config>
