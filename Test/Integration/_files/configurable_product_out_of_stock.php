@@ -23,6 +23,14 @@ $simpleProduct->setStockData([
 ]);
 $productRepository->save($simpleProduct);
 
+$processor = $objectManager->get(\Magento\InventoryCatalogApi\Model\SourceItemsProcessorInterface::class);
+$data = [
+    ['source_code'=>'default', 'status'=>0, 'quantity'=>0],
+];
+foreach(['simple_10', 'simple_20'] as $sku) {
+    $processor->execute($sku, $data);
+}
+
 $configurableProduct = $productRepository->get('configurable');
 $configurableProduct->reindex();
 $configurableProduct->priceReindexCallback();
