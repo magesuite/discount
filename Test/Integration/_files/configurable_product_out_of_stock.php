@@ -27,7 +27,7 @@ $processor = $objectManager->get(\Magento\InventoryCatalogApi\Model\SourceItemsP
 $data = [
     ['source_code'=>'default', 'status'=>0, 'quantity'=>0],
 ];
-foreach(['simple_10', 'simple_20'] as $sku) {
+foreach (['simple_10', 'simple_20'] as $sku) {
     $processor->execute($sku, $data);
 }
 

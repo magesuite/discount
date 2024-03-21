@@ -1,8 +1,8 @@
 <?php
 
-namespace MageSuite\Discount\Plugin\Catalog\Model\ResourceModel\Product\Collection;
+namespace MageSuite\Discount\Model;
 
-class PreloadChildrenWithPrices
+class AddChildrenWithPricesToLoadedItems
 {
     /**
      * @var \Magento\Framework\App\ResourceConnection
@@ -29,17 +29,19 @@ class PreloadChildrenWithPrices
         $this->productCollectionFactory = $productCollectionFactory;
     }
 
-    public function afterLoad(\Magento\Catalog\Model\ResourceModel\Product\Collection $subject, $result)
+    public function execute($collection)
     {
-        if ($subject->hasFlag('children_with_prices_preloaded')) {
-            return $result;
+        if ($collection->hasFlag('children_with_prices_preloaded')) {
+            return $collection;
         }
 
-        $subject->setFlag('children_with_prices_preloaded', true);
+        $collection->setFlag('children_with_prices_preloaded', true);
 
         $productIds = [];
 
-        foreach ($result as $product) {
+        $products = $collection->getItems();
+
+        foreach ($products as $product) {
             if ($product->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                 continue;
             }
@@ -48,20 +50,20 @@ class PreloadChildrenWithPrices
         }
 
         if (empty($productIds)) {
-            return $result;
+            return $collection;
         }
 
         $childrenProductData = $this->getChildProductData($productIds);
         $childrenIds = $childrenProductData->getChildrenIds();
 
         if (empty($childrenIds)) {
-            return $result;
+            return $collection;
         }
 
         $simpleProductsWithPrices = $this->getSimpleProductsWithPrices($childrenIds);
         $parentChildMap = $childrenProductData->getParentChildMap();
 
-        foreach ($result as $item) {
+        foreach ($products as $item) {
             $productId = $item->getId();
 
             if (!isset($parentChildMap[$productId])) {
@@ -83,7 +85,7 @@ class PreloadChildrenWithPrices
             $item->setChildrenWithPrices($children);
         }
 
-        return $result;
+        return $collection;
     }
 
     protected function getChildProductData($productIds)
