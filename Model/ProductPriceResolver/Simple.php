@@ -15,8 +15,8 @@ class Simple extends ProductPriceResolver implements ProductPriceResolverInterfa
         $regularPrice = $this->getRegularPrice($product);
         $productPricesContainer->setRegularPrice($regularPrice);
 
-        if($this->configuration->isSpecialPriceResolverEnabled()) {
-            if(!$product->getSpecialPrice()) {
+        if ($this->configuration->isSpecialPriceResolverEnabled()) {
+            if (!$product->getSpecialPrice()) {
                 $productPricesContainer
                     ->setFinalPrice($regularPrice);
 

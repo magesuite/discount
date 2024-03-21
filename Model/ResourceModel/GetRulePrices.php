@@ -20,8 +20,10 @@ class GetRulePrices
     {
         $connection = $this->resource->getConnection();
         $select = $connection->select()
-            ->from($connection->getTableName('catalogrule_product_price'),
-                ['product_id', 'rule_date', 'website_id', 'customer_group_id', 'rule_price'])
+            ->from(
+                $connection->getTableName('catalogrule_product_price'),
+                ['product_id', 'rule_date', 'website_id', 'customer_group_id', 'rule_price']
+            )
             ->where('product_id IN(?)', $productIds, \Zend_Db::INT_TYPE);
 
         return $connection->fetchAll($select);

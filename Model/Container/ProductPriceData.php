@@ -56,6 +56,7 @@ class ProductPriceData
         }, []);
     }
 
+    // phpcs:ignore
     public function getRulePrices(\DateTimeInterface $date, int $websiteId, int $customerGroupId, array $productIds): array
     {
         $ruleDate = $date->format('Y-m-d');

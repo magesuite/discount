@@ -8,6 +8,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
     protected \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct;
     protected \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage;
     protected \MageSuite\Discount\Model\Container\ProductPriceData $container;
+    protected \MageSuite\Discount\Model\AddChildrenWithPricesToLoadedItems $addChildrenWithPricesToLoadedItems;
 
     /**
      * Product Sku => salePercentage
@@ -19,7 +20,8 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         \MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage,
         \MageSuite\Discount\Helper\Configuration $configuration,
         \MageSuite\Discount\Model\Command\GetMaxPriceForConfigurableProduct $getMaxPriceForConfigurableProduct,
-        \MageSuite\Discount\Model\Container\ProductPriceData $container
+        \MageSuite\Discount\Model\Container\ProductPriceData $container,
+        \MageSuite\Discount\Model\AddChildrenWithPricesToLoadedItems $addChildrenWithPricesToLoadedItems
     ) {
         parent::__construct($context);
 
@@ -27,6 +29,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         $this->configuration = $configuration;
         $this->getMaxPriceForConfigurableProduct = $getMaxPriceForConfigurableProduct;
         $this->container = $container;
+        $this->addChildrenWithPricesToLoadedItems = $addChildrenWithPricesToLoadedItems;
     }
 
     public function isOnSale($product, $finalPrice = null): bool
@@ -42,9 +45,8 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getSalePercentage($product, $finalPrice = null, $isOutOfStock = false)
     {
-        if (
-            $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE &&
-            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE &&
+        if ($product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE &&
+            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE && // phpcs:ignore
             !$isOutOfStock
         ) {
             return $this->getBiggestConfigurationSalePercentage($product);
@@ -93,6 +95,10 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function getChildrenProducts(\Magento\Catalog\Api\Data\ProductInterface $product): array
     {
+        if ($product->getData('origins_from_collection') !== null) {
+            $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
+        }
+
         $childrenProducts = $product->getChildrenWithPrices();
 
         if (!empty($childrenProducts)) {

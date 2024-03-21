@@ -51,7 +51,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->catalogConfig = $this->objectManager->create(\Magento\Catalog\Model\Config::class);
-        $this->productFrontendAction = $this->objectManager->create( \Magento\Catalog\Model\ProductFrontendAction::class);
+        $this->productFrontendAction = $this->objectManager->create(\Magento\Catalog\Model\ProductFrontendAction::class);
 
         $this->discountHelperFactory = $this->objectManager->get(\MageSuite\Discount\Helper\DiscountFactory::class);
     }
@@ -173,7 +173,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $salePercentage = $this->getDiscountHelper()->getSalePercentage($product);
         $this->assertEquals(95, $salePercentage);
     }
-
 
     /**
      * @magentoAppArea frontend
@@ -302,6 +301,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
      * @param $customFinalPrice
      * @param $expected
      */
+    // phpcs:ignore
     public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice, $customFinalPrice, $expected)
     {
         $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice);
@@ -326,6 +326,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    // phpcs:ignore
     protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice)
     {
         $product = $this->productRepository->get('sale_product');

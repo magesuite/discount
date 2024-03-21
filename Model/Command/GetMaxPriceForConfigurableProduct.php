@@ -4,8 +4,19 @@ namespace MageSuite\Discount\Model\Command;
 
 class GetMaxPriceForConfigurableProduct
 {
+    protected \MageSuite\Discount\Model\AddChildrenWithPricesToLoadedItems $addChildrenWithPricesToLoadedItems;
+
+    public function __construct(\MageSuite\Discount\Model\AddChildrenWithPricesToLoadedItems $addChildrenWithPricesToLoadedItems)
+    {
+        $this->addChildrenWithPricesToLoadedItems = $addChildrenWithPricesToLoadedItems;
+    }
+
     public function execute($product)
     {
+        if ($product->getData('origins_from_collection') !== null) {
+            $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
+        }
+
         $childrenProducts = $product->getChildrenWithPrices();
 
         if (empty($childrenProducts)) {

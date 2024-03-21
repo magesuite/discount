@@ -18,11 +18,17 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      */
     protected $productCollectionFactory;
 
+    /**
+     * @var \MageSuite\Discount\Helper\Discount|mixed
+     */
+    protected $discountHelper;
+
     public function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
 
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+        $this->discountHelper = $this->objectManager->create(\MageSuite\Discount\Helper\Discount::class);
     }
 
     /**
@@ -32,13 +38,33 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
      * @magentoDataFixture loadConfigurableProduct
      */
-    public function testChildrenWithPricesAreAddedToCollection()
+    public function testChildrenWithPricesAreNotAddedToCollectionByDefault()
     {
         $productSku = 'configurable';
 
         $collection = $this->getProductCollection($productSku);
 
         foreach ($collection as $item) {
+            $this->assertNull($item->getChildrenWithPrices());
+        }
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture loadConfigurableProduct
+     */
+    public function testChildrenWithPricesAreAddedToCollectionWhenSaleRelatedLogicIsExecuted()
+    {
+        $productSku = 'configurable';
+
+        $collection = $this->getProductCollection($productSku);
+
+        foreach ($collection as $item) {
+            $this->discountHelper->isOnSale($item);
+
             $this->assertNotNull($item->getChildrenWithPrices());
 
             foreach ($item->getChildrenWithPrices() as $childProduct) {
@@ -61,6 +87,7 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
 
         $collection = $this->getProductCollection($productSku);
         $firstItem = $collection->getFirstItem();
+        $this->discountHelper->isOnSale($firstItem);
 
         $this->assertNotNull($firstItem->getChildrenWithPrices());
     }
