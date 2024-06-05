@@ -8,6 +8,7 @@ $sampleProduct->setCustomerGroupId(\Magento\Customer\Model\Group::CUST_GROUP_ALL
 $productRepository->save($sampleProduct);
 
 $bundleProduct = $productRepository->get('bundle-product');
+$bundleProduct->setPrice(100);
 $bundleProduct->setSpecialPrice(65);
 
 $bundleProduct->reindex();

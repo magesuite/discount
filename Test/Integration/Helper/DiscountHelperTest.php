@@ -110,10 +110,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $productFromCollection = $this->getFromCollection($bundleProductSku);
 
         $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromRepository);
-        $this->assertEquals(65, $salePercentage);
+        $this->assertEquals(35, $salePercentage);
 
         $salePercentage = $this->getDiscountHelper()->getSalePercentage($productFromCollection);
-        $this->assertEquals(65, $salePercentage);
+        $this->assertEquals(35, $salePercentage);
     }
 
     /**

@@ -57,8 +57,8 @@ class Bundle extends ProductPriceResolver implements ProductPriceResolverInterfa
     protected function getPricesForFixedPriceType($product)
     {
         return [
-            'regular_price' => 100,
-            'final_price' => 100 - $product->getData('special_price')
+            'regular_price' => (float)$product->getPrice(),
+            'final_price' => $product->getFinalPrice()
         ];
     }
 }
