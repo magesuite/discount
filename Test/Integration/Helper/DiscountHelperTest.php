@@ -3,45 +3,19 @@
 namespace MageSuite\Discount\Test\Integration\Helper;
 
 /**
+ * @magentoAppArea frontend
  * @magentoDbIsolation enabled
  * @magentoAppIsolation enabled
  */
 class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Magento\TestFramework\ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var \Magento\Catalog\Model\Product
-     */
-    protected $product;
-
-    /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
-     */
-    protected $productRepository;
-
-    /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
-     */
-    protected $productCollectionFactory;
-
-    /**
-     * @var \Magento\Catalog\Model\Config
-     */
-    protected $catalogConfig;
-
-    /**
-     * @var \Magento\Catalog\Model\ProductFrontendAction
-     */
-    protected $productFrontendAction;
-
-    /**
-     * @var \MageSuite\Discount\Helper\DiscountFactory
-     */
-    protected $discountHelperFactory;
+    protected ?\Magento\TestFramework\ObjectManager $objectManager;
+    protected ?\Magento\Catalog\Model\Product $product;
+    protected ?\Magento\Catalog\Api\ProductRepositoryInterface $productRepository;
+    protected ?\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory;
+    protected ?\Magento\Catalog\Model\Config $catalogConfig;
+    protected ?\Magento\Catalog\Model\ProductFrontendAction $productFrontendAction;
+    protected ?\MageSuite\Discount\Helper\DiscountFactory $discountHelperFactory;
 
     public function setUp(): void
     {
@@ -57,13 +31,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
-    public function testItReturnsCorrectDataForConfigurableProducts()
+    public function testItReturnsCorrectDataForConfigurableProducts(): void
     {
         $configurableProductSku = 'configurable';
 
@@ -77,7 +48,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->itReturnsCorrectSalePercentage($productFromCollection);
     }
 
-    protected function itReturnsCorrectConfigurableDiscounts($configurableProduct)
+    protected function itReturnsCorrectConfigurableDiscounts(\Magento\Catalog\Api\Data\ProductInterface $configurableProduct): void
     {
         $expectedResult = [
             $this->product->getIdBySku('simple_10') => 95,
@@ -89,7 +60,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $configurableDiscounts);
     }
 
-    protected function itReturnsCorrectSalePercentage($configurableProduct)
+    protected function itReturnsCorrectSalePercentage(\Magento\Catalog\Api\Data\ProductInterface $configurableProduct): void
     {
         $salePercentage = $this->getDiscountHelper()->getSalePercentage($configurableProduct);
 
@@ -97,12 +68,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Bundle/_files/product.php
-     * @magentoDataFixture loadBundleProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/bundle_product.php
      */
-    public function testItReturnsCorrectSalePercentageForBundleProduct()
+    public function testItReturnsCorrectSalePercentageForBundleProduct(): void
     {
         $bundleProductSku = 'bundle-product';
 
@@ -117,13 +86,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
-     * @magentoDataFixture loadProductWithTax
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/product_with_tax.php
      * @magentoConfigFixture current_store tax/calculation/price_includes_tax 0
      * @magentoConfigFixture current_store tax/display/type 2
      */
-    public function testItReturnsCorrectSalePercentageForProductWithTax()
+    public function testItReturnsCorrectSalePercentageForProductWithTax(): void
     {
         $productWithTaxSku = 'product_with_tax';
 
@@ -139,11 +106,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @magentoDbIsolation disabled
-     * @magentoAppIsolation enabled
-     * @magentoDataFixture loadProduct
-     * @magentoDataFixture loadCatalogRule
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/product.php
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/catalog_rule.php
      */
-    public function testItReturnsCorrectSalePercentageForCatalogRule()
+    public function testItReturnsCorrectSalePercentageForCatalogRule(): void
     {
         $productSku = 'product';
 
@@ -158,14 +124,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
-    public function testCorrectFinalPriceFromChildrenSpecialPrice()
+    public function testCorrectFinalPriceFromChildrenSpecialPrice(): void
     {
         $productSku = 'configurable';
         $product = $this->getFromRepository($productSku);
@@ -175,13 +138,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
      */
-    public function testCorrectFinalPriceFromChildrenWithoutSpecialPrice()
+    public function testCorrectFinalPriceFromChildrenWithoutSpecialPrice(): void
     {
         $productSku = 'configurable';
         $product = $this->getFromRepository($productSku);
@@ -192,14 +152,25 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
-     * @magentoDataFixture loadProduct
-     * @magentoDataFixture loadProductWithTax
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product_with_dates.php
      */
-    public function testSalePercentageSimpleProductsWithSpecialPriceResolver()
+    public function testCorrectFinalPriceFromChildrenSpecialPriceWithDates(): void
+    {
+        $productSku = 'configurable';
+        $product = $this->getFromRepository($productSku);
+
+        $salePercentage = $this->getDiscountHelper()->getSalePercentage($product);
+        $this->assertEquals(68, $salePercentage);
+    }
+
+    /**
+     * @magentoConfigFixture current_store catalog/frontend/is_special_price_resolver_enabled 1
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/product.php
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/product_with_tax.php
+     */
+    public function testSalePercentageSimpleProductsWithSpecialPriceResolver(): void
     {
         $productSku = 'product';
         $productTaxSku = 'product_with_tax';
@@ -214,14 +185,11 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
      */
-    public function testItReturnsCorrectDataForConfigurableProductsWithAlternativeDiscountCalculationType()
+    public function testItReturnsCorrectDataForConfigurableProductsWithAlternativeDiscountCalculationType(): void
     {
         $configurableProductSku = 'configurable';
 
@@ -236,15 +204,12 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProductOutOfStock
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product_out_of_stock.php
      * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
      * @magentoConfigFixture current_store cataloginventory/options/show_out_of_stock 0
      */
-    public function testItWorksWithOutOfStockConfigurableProducts()
+    public function testItWorksWithOutOfStockConfigurableProducts(): void
     {
         $configurableProductSku = 'configurable';
         $product = $this->getFromRepository($configurableProductSku);
@@ -254,13 +219,10 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
      * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
      */
-    public function testSalePercentageReturnsZeroInsteadOfError()
+    public function testSalePercentageReturnsZeroInsteadOfError(): void
     {
         $this->productFrontendAction->setTypeId(\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE);
 
@@ -268,7 +230,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $discountHelper->getSalePercentage($this->productFrontendAction));
     }
 
-    protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType($configurableProduct)
+    protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType(\Magento\Catalog\Api\Data\ProductInterface $configurableProduct): void
     {
         $expectedResult = [
             $this->product->getIdBySku('simple_10') => 90,
@@ -280,7 +242,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $configurableDiscounts);
     }
 
-    protected function itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($configurableProduct)
+    protected function itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType(\Magento\Catalog\Api\Data\ProductInterface $configurableProduct): void
     {
         $salePercentage = $this->getDiscountHelper()->getSalePercentage($configurableProduct);
 
@@ -288,46 +250,42 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
-     * @magentoAppIsolation enabled
-     * @magentoDataFixture loadSaleProduct
-     * @dataProvider getPercentage
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/sale_product.php
+     * @dataProvider getPercentageForSimpleProduct
      * @param $specialPrice
      * @param $specialPriceFrom
      * @param $specialPriceTo
      * @param $getPrice
-     * @param $getFinalPrice
      * @param $customFinalPrice
      * @param $expected
      */
     // phpcs:ignore
-    public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice, $customFinalPrice, $expected)
+    public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $customFinalPrice, $expected): void
     {
-        $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice);
+        $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice);
 
         $this->assertEquals($expected, $this->getDiscountHelper()->getSalePercentage($productStub, $customFinalPrice));
     }
 
-    public function getPercentage()
+    public function getPercentageForSimpleProduct(): array
     {
         return [
-            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, 100, null, 50],
-            [100, date('Y-m-d 00:00:00', strtotime('+7 days')), date('Y-m-d 00:00:00', strtotime('+17 days')), 200, 100, null, false],
-            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, 100, null, false],
-            [300, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, 100, null, false],
-            ['', date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, 100, null, false],
-            [150, null, date('Y-m-d 00:00:00', strtotime('+3 days')), 500, 150, null, 70],
-            [100, null, date('Y-m-d 00:00:00', strtotime('-3 days')), 200, 100, null, false],
-            [10, date('Y-m-d 00:00:00', strtotime('-3 days')), null, 300, 10, null, 97],
-            ['', null, null, 200, 100, null, false],
-            ['', null, null, 200, 100, 50, 75],
-            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, 100, 50, 75],
+            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, null, 50],
+            [100, date('Y-m-d 00:00:00', strtotime('+7 days')), date('Y-m-d 00:00:00', strtotime('+17 days')), 200, null, false],
+            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, null, false],
+            [300, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, null, false],
+            ['', date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('-3 days')), 200, null, false],
+            [150, null, date('Y-m-d 00:00:00', strtotime('+3 days')), 500, null, 70],
+            [100, null, date('Y-m-d 00:00:00', strtotime('-3 days')), 200, null, false],
+            [10, date('Y-m-d 00:00:00', strtotime('-3 days')), null, 300, null, 97],
+            ['', null, null, 200, null, false],
+            ['', null, null, 200, 50, 75],
+            [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, 50, 75],
         ];
     }
 
     // phpcs:ignore
-    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $getFinalPrice)
+    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice): \Magento\Catalog\Api\Data\ProductInterface
     {
         $product = $this->productRepository->get('sale_product');
 
@@ -343,12 +301,12 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         return $product;
     }
 
-    protected function getFromRepository($productSku)
+    protected function getFromRepository(string $productSku): \Magento\Catalog\Api\Data\ProductInterface
     {
         return $this->productRepository->get($productSku);
     }
 
-    protected function getFromCollection($productSku)
+    protected function getFromCollection(string $productSku): \Magento\Catalog\Api\Data\ProductInterface
     {
         $collection = $this->productCollectionFactory->create();
 
@@ -359,63 +317,8 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
             ->getFirstItem();
     }
 
-    protected function getDiscountHelper()
+    protected function getDiscountHelper(): \MageSuite\Discount\Helper\Discount
     {
         return $this->discountHelperFactory->create();
-    }
-
-    public static function loadSaleProduct()
-    {
-        require __DIR__ . '/../_files/sale_product.php';
-    }
-
-    public static function loadSaleProductRollback()
-    {
-        require __DIR__ . '/../_files/sale_product_rollback.php';
-    }
-
-    public static function loadConfigurableProduct()
-    {
-        require __DIR__ . '/../_files/configurable_product.php';
-    }
-
-    public static function loadConfigurableProductOutOfStock()
-    {
-        require __DIR__ . '/../_files/configurable_product_out_of_stock.php';
-    }
-
-    public static function loadBundleProduct()
-    {
-        require __DIR__ . '/../_files/bundle_product.php';
-    }
-
-    public static function loadProductWithTax()
-    {
-        require __DIR__ . '/../_files/product_with_tax.php';
-    }
-
-    public static function loadProductWithTaxRollback()
-    {
-        require __DIR__ . '/../_files/product_with_tax_rollback.php';
-    }
-
-    public static function loadProduct()
-    {
-        require __DIR__ . '/../_files/product.php';
-    }
-
-    public static function loadProductRollback()
-    {
-        require __DIR__ . '/../_files/product_rollback.php';
-    }
-
-    public static function loadCatalogRule()
-    {
-        require __DIR__ . '/../_files/catalog_rule.php';
-    }
-
-    public static function loadCatalogRuleRollback()
-    {
-        require __DIR__ . '/../_files/catalog_rule_rollback.php';
     }
 }

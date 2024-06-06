@@ -16,4 +16,13 @@
         </arguments>
     </type>
 
+    <type name="MageSuite\Discount\Model\AddChildrenWithPricesToLoadedItems">
+        <arguments>
+            <argument name="attributesToSelect" xsi:type="array">
+                <item name="special_price" xsi:type="string">special_price</item>
+                <item name="special_price_from" xsi:type="string">special_from_date</item>
+                <item name="special_price_to" xsi:type="string">special_to_date</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
