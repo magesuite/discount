@@ -4,32 +4,24 @@ namespace MageSuite\Discount\Model;
 
 class AddChildrenWithPricesToLoadedItems
 {
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
-    protected $resource;
-
-    /**
-     * @var \Magento\ConfigurableProduct\Model\ResourceModel\Attribute\OptionProvider
-     */
-    protected $optionProvider;
-
-    /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
-     */
-    protected $productCollectionFactory;
+    protected \Magento\Framework\App\ResourceConnection $resource;
+    protected \Magento\ConfigurableProduct\Model\ResourceModel\Attribute\OptionProvider $optionProvider;
+    protected \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory;
+    protected array $attributesToSelect = [];
 
     public function __construct(
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\ConfigurableProduct\Model\ResourceModel\Attribute\OptionProvider $optionProvider,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
+        $attributesToSelect = []
     ) {
         $this->resource = $resource;
         $this->optionProvider = $optionProvider;
         $this->productCollectionFactory = $productCollectionFactory;
+        $this->attributesToSelect = $attributesToSelect;
     }
 
-    public function execute($collection)
+    public function execute(\Magento\Eav\Model\Entity\Collection\AbstractCollection $collection): \Magento\Eav\Model\Entity\Collection\AbstractCollection
     {
         if ($collection->hasFlag('children_with_prices_preloaded')) {
             return $collection;
@@ -88,7 +80,7 @@ class AddChildrenWithPricesToLoadedItems
         return $collection;
     }
 
-    protected function getChildProductData($productIds)
+    protected function getChildProductData(array $productIds): \Magento\Framework\DataObject
     {
         $result = new \Magento\Framework\DataObject([
             'children_ids' => null,
@@ -130,13 +122,14 @@ class AddChildrenWithPricesToLoadedItems
         return $result;
     }
 
-    protected function getSimpleProductsWithPrices($productIds)
+    protected function getSimpleProductsWithPrices(array $productIds): \Magento\Eav\Model\Entity\Collection\AbstractCollection
     {
         $collection = $this->productCollectionFactory->create();
 
         return $collection
             ->addFieldToFilter($this->optionProvider->getProductEntityLinkField(), ['in' => $productIds])
             ->setFlag('children_with_prices_preloaded', true)
+            ->addAttributeToSelect($this->attributesToSelect)
             ->addPriceData()
             ->load();
     }
