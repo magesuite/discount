@@ -1,0 +1,15 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:MageSuite_Changelog:etc/changelog.xsd">
+    <module id="MageSuite_Discount" name="MageSuite_Discount" url="https://github.com/magesuite/discount">
+        <changelog>
+            <tag version="1.4.5" date="2023-06-14">
+                <entry>
+                    <type>FEAT</type>
+                    <overview>Fix for strict type doesn't match for geting min  price of configurable product.</overview>
+                    <ticket_id>DOG-1897</ticket_id>
+                </entry>
+            </tag>
+
+        </changelog>
+    </module>
+</config>
