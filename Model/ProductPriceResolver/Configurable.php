@@ -51,8 +51,8 @@ class Configurable extends ProductPriceResolver implements ProductPriceResolverI
             return $productPricesContainer;
         }
 
-        if ($this->configuration->isSpecialPriceResolverEnabled()) {
-            $specialPriceMinimum = $this->getMinSpecialPriceForConfigurableProduct->execute($product, $regularPrice);
+        if ($this->configuration->isSpecialPriceResolverEnabled() && $regularPrice) {
+            $specialPriceMinimum = $this->getMinSpecialPriceForConfigurableProduct->execute($product, (float) $regularPrice);
             $productPricesContainer->setFinalPrice($specialPriceMinimum);
             return $productPricesContainer;
         }
