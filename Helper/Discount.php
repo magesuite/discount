@@ -32,7 +32,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         $this->addChildrenWithPricesToLoadedItems = $addChildrenWithPricesToLoadedItems;
     }
 
-    public function isOnSale($product, $finalPrice = null): bool
+    public function isOnSale(\Magento\Catalog\Api\Data\ProductInterface $product, ?float $finalPrice = null): bool
     {
         $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
 
@@ -43,13 +43,22 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $salePercentage > 0;
     }
 
-    public function getSalePercentage($product, $finalPrice = null, $isOutOfStock = false)
+    public function getSalePercentage(\Magento\Catalog\Api\Data\ProductInterface $product, ?float $finalPrice = null, bool $isOutOfStock = false): int
     {
-        if ($product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE &&
-            $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE && // phpcs:ignore
-            !$isOutOfStock
+        if (
+            $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
+            && $this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_BIGGEST_DIFFERENCE_BETWEEN_SAME_SIMPLE_SPEICAL_AND_REGULAR_PRICE
+            && !$isOutOfStock
         ) {
             return $this->getBiggestConfigurationSalePercentage($product);
+        }
+
+        if (
+            $product->getTypeId() === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
+            && $this->configuration->showBiggestDiscountFromChildrenOfGroupedProduct()
+            && !$isOutOfStock
+        ) {
+            return $this->getBiggestSalePercentageFromChildrenOfGroupedProduct($product, $finalPrice);
         }
 
         $salePercentage = $this->getCachedSalePercentage($product->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($product, $finalPrice);
@@ -65,9 +74,9 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return 0;
     }
 
-    public function getConfigurableDiscounts($product): array
+    public function getConfigurableDiscounts(\Magento\Catalog\Api\Data\ProductInterface $product): array
     {
-        if (!$product instanceof \Magento\Catalog\Api\Data\ProductInterface || $product->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+        if ($product->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
             return [];
         }
 
@@ -108,7 +117,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $product->getTypeInstance()->getUsedProducts($product);
     }
 
-    protected function getConfigurableChildProductDiscount($maxConfigurablePrice, $childProduct)
+    protected function getConfigurableChildProductDiscount(float $maxConfigurablePrice, \Magento\Catalog\Api\Data\ProductInterface $childProduct): ?int
     {
         //ensure product has correct prices for configurable item
         $childProductPrice = $childProduct->getData('final_price') ?? $childProduct->getFinalPrice();
@@ -120,7 +129,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getSalePercentage($childProduct);
     }
 
-    protected function getCachedSalePercentage($productSku, $finalPrice)
+    protected function getCachedSalePercentage(string $productSku, ?float $finalPrice): ?int
     {
         if (!isset($this->cachedSalePercentage[$productSku])) {
             return null;
@@ -133,7 +142,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->cachedSalePercentage[$productSku]['default'] ?? null;
     }
 
-    protected function setCachedSalePercentage($productSku, $finalPrice, $salePercentage)
+    protected function setCachedSalePercentage(string $productSku, ?float $finalPrice, int $salePercentage): void
     {
         if ($finalPrice) {
             $this->cachedSalePercentage[$productSku][(string)$finalPrice] = $salePercentage;
@@ -142,11 +151,31 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
-    protected function getBiggestConfigurationSalePercentage($product)
+    protected function getBiggestConfigurationSalePercentage(\Magento\Catalog\Api\Data\ProductInterface $product): int
     {
         $discounts = $this->getConfigurableDiscounts($product);
+
         if (!empty($discounts)) {
             return max($discounts);
+        }
+
+        return 0;
+    }
+
+    protected function getBiggestSalePercentageFromChildrenOfGroupedProduct(\Magento\Catalog\Api\Data\ProductInterface $product, ?float $finalPrice = null): int
+    {
+        $salePercentage = 0;
+        $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+
+        foreach ($associatedProducts as $associatedProduct) {
+            $childrenSalePercentage = $this->getCachedSalePercentage($associatedProduct->getSku(), $finalPrice) ?? $this->getSalePercentage->execute($associatedProduct, $finalPrice);
+            if ($childrenSalePercentage > $salePercentage) {
+                $salePercentage = $childrenSalePercentage;
+            }
+        }
+
+        if ((int)$salePercentage >= $this->configuration->getMinimalSalePercentage()) {
+            return $salePercentage;
         }
 
         return 0;
