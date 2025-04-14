@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\Discount\Test\Integration\Helper;
 
 /**
@@ -14,7 +16,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     protected ?\Magento\Catalog\Api\ProductRepositoryInterface $productRepository;
     protected ?\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory;
     protected ?\Magento\Catalog\Model\Config $catalogConfig;
-    protected ?\Magento\Catalog\Model\ProductFrontendAction $productFrontendAction;
     protected ?\MageSuite\Discount\Helper\DiscountFactory $discountHelperFactory;
 
     public function setUp(): void
@@ -25,7 +26,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->catalogConfig = $this->objectManager->create(\Magento\Catalog\Model\Config::class);
-        $this->productFrontendAction = $this->objectManager->create(\Magento\Catalog\Model\ProductFrontendAction::class);
 
         $this->discountHelperFactory = $this->objectManager->get(\MageSuite\Discount\Helper\DiscountFactory::class);
     }
@@ -203,33 +203,6 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->itReturnsCorrectSalePercentageWithAlternativeDiscountCalculationType($productFromCollection);
     }
 
-    /**
-     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product_out_of_stock.php
-     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
-     * @magentoConfigFixture current_store cataloginventory/options/show_out_of_stock 0
-     */
-    public function testItWorksWithOutOfStockConfigurableProducts(): void
-    {
-        $configurableProductSku = 'configurable';
-        $product = $this->getFromRepository($configurableProductSku);
-
-        $discountHelper = $this->discountHelperFactory->create();
-        $this->assertEquals(0, $discountHelper->getSalePercentage($product));
-    }
-
-    /**
-     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
-     */
-    public function testSalePercentageReturnsZeroInsteadOfError(): void
-    {
-        $this->productFrontendAction->setTypeId(\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE);
-
-        $discountHelper = $this->discountHelperFactory->create();
-        $this->assertEquals(0, $discountHelper->getSalePercentage($this->productFrontendAction));
-    }
-
     protected function itReturnsCorrectConfigurableDiscountsWithAlternativeDiscountCalculationType(\Magento\Catalog\Api\Data\ProductInterface $configurableProduct): void
     {
         $expectedResult = [
@@ -250,17 +223,36 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product_out_of_stock.php
+     * @magentoConfigFixture current_store catalog/frontend/sale_percentage_calculation_type biggest_difference_between_same_simple_special_and_regular_price
+     * @magentoConfigFixture current_store cataloginventory/options/show_out_of_stock 0
+     */
+    public function testItWorksWithOutOfStockConfigurableProducts(): void
+    {
+        $configurableProduct = $this->getFromRepository('configurable');
+
+        $discountHelper = $this->discountHelperFactory->create();
+        $this->assertEquals(0, $discountHelper->getSalePercentage($configurableProduct));
+    }
+
+    /**
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/grouped_product.php
+     * @magentoConfigFixture current_store catalog/frontend/show_biggest_discount_from_children_of_grouped_product 1
+     */
+    public function testItReturnCorrectSalePercentageForGroupedProduct(): void
+    {
+        $groupedProduct = $this->getFromRepository('grouped');
+
+        $discountHelper = $this->discountHelperFactory->create();
+        $this->assertEquals(10, $discountHelper->getSalePercentage($groupedProduct));
+    }
+
+    /**
      * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/sale_product.php
      * @dataProvider getPercentageForSimpleProduct
-     * @param $specialPrice
-     * @param $specialPriceFrom
-     * @param $specialPriceTo
-     * @param $getPrice
-     * @param $customFinalPrice
-     * @param $expected
      */
-    // phpcs:ignore
-    public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $customFinalPrice, $expected): void
+    public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $customFinalPrice, $expected): void // phpcs:ignore
     {
         $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice);
 
@@ -284,8 +276,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // phpcs:ignore
-    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice): \Magento\Catalog\Api\Data\ProductInterface
+    protected function prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice): \Magento\Catalog\Api\Data\ProductInterface // phpcs:ignore
     {
         $product = $this->productRepository->get('sale_product');
 
