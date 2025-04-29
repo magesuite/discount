@@ -117,7 +117,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
         return $product->getTypeInstance()->getUsedProducts($product);
     }
 
-    protected function getConfigurableChildProductDiscount(float $maxConfigurablePrice, \Magento\Catalog\Api\Data\ProductInterface $childProduct): ?int
+    protected function getConfigurableChildProductDiscount(?float $maxConfigurablePrice, \Magento\Catalog\Api\Data\ProductInterface $childProduct): ?int
     {
         //ensure product has correct prices for configurable item
         $childProductPrice = $childProduct->getData('final_price') ?? $childProduct->getFinalPrice();
