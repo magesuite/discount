@@ -13,7 +13,7 @@ class GetMaxPriceForConfigurableProduct
 
     public function execute($product)
     {
-        if ($product->getData('origins_from_collection') !== null) {
+        if ($product->getData('origins_from_collection') instanceof \Magento\Eav\Model\Entity\Collection\AbstractCollection) {
             $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
         }
 

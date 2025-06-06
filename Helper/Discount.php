@@ -104,7 +104,7 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function getChildrenProducts(\Magento\Catalog\Api\Data\ProductInterface $product): array
     {
-        if ($product->getData('origins_from_collection') !== null) {
+        if ($product->getData('origins_from_collection') instanceof \Magento\Eav\Model\Entity\Collection\AbstractCollection) {
             $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
         }
 
