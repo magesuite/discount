@@ -17,7 +17,7 @@ class GetMinSpecialPriceForConfigurableProduct
 
     public function execute(\Magento\Catalog\Api\Data\ProductInterface $product, float $regularPrice): float
     {
-        if ($product->getData('origins_from_collection') !== null) {
+        if ($product->getData('origins_from_collection') instanceof \Magento\Eav\Model\Entity\Collection\AbstractCollection) {
             $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
         }
 
