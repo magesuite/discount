@@ -8,6 +8,11 @@
                     <comment>The discount badge will be visible only if discount is bigger than this value.</comment>
                     <frontend_class>cs-csfeature__logo</frontend_class>
                 </field>
+                <field id="rounding_sale_percentage" translate="label" type="select" sortOrder="355" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Rounding Sale Percentage</label>
+                    <source_model>MageSuite\Discount\Model\Config\Source\RoundingType</source_model>
+                    <frontend_class>cs-csfeature__logo</frontend_class>
+                </field>
                 <field id="is_special_price_resolver_enabled" translate="label" type="select" sortOrder="360" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Sale badge visibility on frontend calculated from Special Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

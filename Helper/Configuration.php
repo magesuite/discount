@@ -7,6 +7,7 @@ namespace MageSuite\Discount\Helper;
 class Configuration
 {
     public const XML_PATH_CATALOG_FRONTEND_MINIMAL_SALE_PERCENTAGE = 'catalog/frontend/minimal_sale_percentage';
+    public const XML_PATH_CATALOG_FRONTEND_ROUNDING_SALE_PERCENTAGE = 'catalog/frontend/rounding_sale_percentage';
     public const XML_PATH_CATALOG_FRONTEND_IS_SPECIAL_PRICE_RESOLVER_ENABLED = 'catalog/frontend/is_special_price_resolver_enabled';
     public const XML_PATH_CATALOG_FRONTEND_SALE_PERCENTAGE_CALCULATION_TYPE = 'catalog/frontend/sale_percentage_calculation_type';
     public const XML_PATH_CATALOG_FRONTEND_SHOW_BIGGEST_DISCOUNT_FROM_CHILDREN_OF_GROUPED_PRODUCT = 'catalog/frontend/show_biggest_discount_from_children_of_grouped_product';
@@ -21,6 +22,11 @@ class Configuration
     public function getMinimalSalePercentage(): int
     {
         return (int)$this->scopeConfig->getValue(self::XML_PATH_CATALOG_FRONTEND_MINIMAL_SALE_PERCENTAGE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+
+    public function getRoundingSalePercentage(): int
+    {
+        return (int)$this->scopeConfig->getValue(self::XML_PATH_CATALOG_FRONTEND_ROUNDING_SALE_PERCENTAGE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     public function isSpecialPriceResolverEnabled(): bool

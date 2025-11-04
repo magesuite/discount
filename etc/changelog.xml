@@ -9,7 +9,13 @@
                     <ticket_id>DOG-1897</ticket_id>
                 </entry>
             </tag>
-
+            <tag version="1.5.4" date="2025-11-04">
+                <entry>
+                    <type>FEAT</type>
+                    <overview>Add rounding type configuration for discount percentage.</overview>
+                    <ticket_id>MOV-891</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
