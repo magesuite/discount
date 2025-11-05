@@ -1,20 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\Discount\Model\Command;
 
 class GetSalePercentage
 {
-    /**
-     * @var \MageSuite\Discount\Api\ProductPriceResolverInterface
-     */
-    protected $productPriceResolver;
+    public function __construct(
+        protected \MageSuite\Discount\Api\ProductPriceResolverInterface $productPriceResolver,
+        protected \MageSuite\Discount\Helper\Configuration $configuration
+    ){}
 
-    public function __construct(\MageSuite\Discount\Api\ProductPriceResolverInterface $productPriceResolver)
-    {
-        $this->productPriceResolver = $productPriceResolver;
-    }
-
-    public function execute($product, $finalPrice)
+    public function execute(\Magento\Catalog\Api\Data\ProductInterface $product, ?float $finalPrice = null): int
     {
         /** @var \MageSuite\Discount\Api\Data\ProductPricesInterface $productPrices */
         $productPrices = $this->productPriceResolver->getPrices($product, $finalPrice);
@@ -35,11 +32,19 @@ class GetSalePercentage
             return 0;
         }
 
-        return (int)$this->calculateDiscountPercent($productPrices->getRegularPrice(), $productPrices->getFinalPrice());
+        return $this->calculateDiscountPercent($productPrices->getRegularPrice(), $productPrices->getFinalPrice());
     }
 
-    protected function calculateDiscountPercent($regularPrice, $finalPrice)
+    protected function calculateDiscountPercent(float $regularPrice, float $finalPrice): int
     {
-        return round((($regularPrice - $finalPrice) / $regularPrice) * 100, 0);
+        $roundingType = $this->configuration->getRoundingSalePercentage();
+
+        $value = (($regularPrice - $finalPrice) / $regularPrice) * 100;
+
+        if ($roundingType) {
+            return (int) round($value, 0, $roundingType);
+        }
+
+        return (int) $value;
     }
 }
