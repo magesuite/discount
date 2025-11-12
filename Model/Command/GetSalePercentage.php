@@ -45,6 +45,6 @@ class GetSalePercentage
             return (int) round($value, 0, $roundingType);
         }
 
-        return (int) $value;
+        return (int) floor($value);
     }
 }
