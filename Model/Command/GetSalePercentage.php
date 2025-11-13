@@ -39,12 +39,12 @@ class GetSalePercentage
     {
         $roundingType = $this->configuration->getRoundingSalePercentage();
 
-        $value = (($regularPrice - $finalPrice) / $regularPrice) * 100;
+        $value = ($regularPrice * 100 - $finalPrice * 100) / $regularPrice;
 
         if ($roundingType) {
             return (int) round($value, 0, $roundingType);
         }
 
-        return (int) floor($value);
+        return (int) $value;
     }
 }
