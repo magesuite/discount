@@ -120,11 +120,13 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getConfigurableChildProductDiscount(?float $maxConfigurablePrice, \Magento\Catalog\Api\Data\ProductInterface $childProduct): ?int
     {
         //ensure product has correct prices for configurable item
-        $childProductPrice = $childProduct->getData('final_price') ??
-            $childProduct->getPriceInfo()
+        $childProductPrice = $childProduct->getData('final_price') ?? $childProduct->getFinalPrice();
+        if ($childProductPrice === null) {
+            $childProductPrice = $childProduct->getPriceInfo()
                 ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
                 ->getAmount()
                 ->getValue();
+        }
 
         if ($this->configuration->getSalePercentageCalculationType() === \MageSuite\Discount\Model\Config\Source\CalculationType::CALCULATION_TYPE_CHEAPEST_SIMPLE_TO_MOST_EXPENSIVE_REGULAR) {
             $childProduct->setData('price', $maxConfigurablePrice);
