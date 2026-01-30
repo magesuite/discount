@@ -26,7 +26,6 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
-
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->discountHelper = $this->objectManager->create(\MageSuite\Discount\Helper\Discount::class);
     }
@@ -36,7 +35,7 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
     public function testChildrenWithPricesAreNotAddedToCollectionByDefault()
     {
@@ -54,7 +53,7 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
     public function testChildrenWithPricesAreAddedToCollectionWhenSaleRelatedLogicIsExecuted()
     {
@@ -79,7 +78,7 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
     public function testChildrenWithPricesAreAddedToFirstItem()
     {
@@ -98,10 +97,5 @@ class PreloadChildrenWithPricesTest extends \PHPUnit\Framework\TestCase
 
         return $collection
             ->addFieldToFilter('sku', $productSku);
-    }
-
-    public static function loadConfigurableProduct()
-    {
-        require __DIR__ . '/../../../../../../_files/configurable_product.php';
     }
 }

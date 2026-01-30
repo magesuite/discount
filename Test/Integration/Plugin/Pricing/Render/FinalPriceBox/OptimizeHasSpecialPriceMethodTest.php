@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\Discount\Test\Integration\Plugin\Pricing\Render\FinalPriceBox;
 
 /**
@@ -8,20 +10,9 @@ namespace MageSuite\Discount\Test\Integration\Plugin\Pricing\Render\FinalPriceBo
  */
 class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Magento\TestFramework\ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
-     */
-    protected $productRepository;
-
-    /**
-     * @var \Magento\Catalog\Block\Product\View
-     */
-    protected $productView;
+    protected ?\Magento\TestFramework\ObjectManager $objectManager;
+    protected ?\Magento\Catalog\Api\ProductRepositoryInterface $productRepository;
+    protected ?\Magento\Catalog\Block\Product\View $productView;
 
     public function setUp(): void
     {
@@ -70,7 +61,7 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/ConfigurableProduct/_files/configurable_products.php
-     * @magentoDataFixture loadConfigurableProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/configurable_product.php
      */
     public function testItReturnCorrectHtmlForConfigurableWithSpecialPrice()
     {
@@ -88,7 +79,7 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
     /**
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadProduct
+     * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/product_with_tax.php
      */
     public function testItReturnCorrectHtmlForProductWithSpecialPrice()
     {
@@ -113,15 +104,5 @@ class OptimizeHasSpecialPriceMethodTest extends \PHPUnit\Framework\TestCase
             \Magento\Framework\Pricing\Render::ZONE_ITEM_LIST,
             ['area' => 'frontend']
         );
-    }
-
-    public static function loadConfigurableProduct()
-    {
-        require __DIR__ . '/../../../../_files/configurable_product.php';
-    }
-
-    public static function loadProduct()
-    {
-        require __DIR__ . '/../../../../_files/product_with_tax.php';
     }
 }
