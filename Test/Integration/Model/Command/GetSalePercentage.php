@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Integration\Model\Command;
+namespace MageSuite\Discount\Test\Integration\Model\Command;
 
 class GetSalePercentage extends \PHPUnit\Framework\TestCase
 {
-    protected ?\MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage = null;
-    protected ?\Magento\Catalog\Api\Data\ProductInterface $product = null;
+    protected ?\MageSuite\Discount\Model\Command\GetSalePercentage $getSalePercentage;
+    protected ?\Magento\Catalog\Api\Data\ProductInterface $product;
 
     protected function setUp(): void
     {

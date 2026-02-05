@@ -6,10 +6,10 @@ namespace MageSuite\Discount\Test\Integration\Model\Container;
 
 class ProductPriceDataTest extends \PHPUnit\Framework\TestCase
 {
-    protected ?\Magento\CatalogRule\Model\ResourceModel\Rule $originalGetRulePrices = null;
-    protected ?\MageSuite\Discount\Model\Container\ProductPriceData $container = null;
-    protected ?int $productId = null;
-    protected ?int $websiteId = null;
+    protected ?\Magento\CatalogRule\Model\ResourceModel\Rule $originalGetRulePrices;
+    protected ?\MageSuite\Discount\Model\Container\ProductPriceData $container;
+    protected ?int $productId;
+    protected ?int $websiteId;
 
     protected function setUp(): void
     {
@@ -58,7 +58,7 @@ class ProductPriceDataTest extends \PHPUnit\Framework\TestCase
      * @magentoDataFixture Magento/Catalog/_files/products.php
      * @magentoDataFixture Magento/CatalogRule/_files/rule_adjust_final_price_to_discount_value_not_logged_user.php
      */
-    public function testCompareResults()
+    public function testCompareResults(): void
     {
         $this->container->initProducts([$this->productId]);
 
