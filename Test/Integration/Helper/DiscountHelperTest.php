@@ -250,8 +250,8 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @magentoDataFixture MageSuite_Discount::Test/Integration/_files/sale_product.php
-     * @dataProvider getPercentageForSimpleProduct
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getPercentageForSimpleProduct')]
     public function testItReturnsCorrectPercentage($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice, $customFinalPrice, $expected): void // phpcs:ignore
     {
         $productStub = $this->prepareProductStubForOnSale($specialPrice, $specialPriceFrom, $specialPriceTo, $getPrice);
@@ -259,7 +259,7 @@ class DiscountHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->getDiscountHelper()->getSalePercentage($productStub, $customFinalPrice));
     }
 
-    public function getPercentageForSimpleProduct(): array
+    public static function getPercentageForSimpleProduct(): array
     {
         return [
             [100, date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 00:00:00', strtotime('+7 days')), 200, null, 50],
