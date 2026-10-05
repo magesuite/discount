@@ -29,9 +29,14 @@ class AddChildrenWithPricesToLoadedItems
 
         $collection->setFlag('children_with_prices_preloaded', true);
 
-        $productIds = [];
+        $this->addChildrenWithPricesToProducts($collection->getItems());
 
-        $products = $collection->getItems();
+        return $collection;
+    }
+
+    public function addChildrenWithPricesToProducts(array $products): void
+    {
+        $productIds = [];
 
         foreach ($products as $product) {
             if ($product->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
@@ -42,14 +47,14 @@ class AddChildrenWithPricesToLoadedItems
         }
 
         if (empty($productIds)) {
-            return $collection;
+            return;
         }
 
         $childrenProductData = $this->getChildProductData($productIds);
         $childrenIds = $childrenProductData->getChildrenIds();
 
         if (empty($childrenIds)) {
-            return $collection;
+            return;
         }
 
         $simpleProductsWithPrices = $this->getSimpleProductsWithPrices($childrenIds);
@@ -76,8 +81,6 @@ class AddChildrenWithPricesToLoadedItems
 
             $item->setChildrenWithPrices($children);
         }
-
-        return $collection;
     }
 
     protected function getChildProductData(array $productIds): \Magento\Framework\DataObject

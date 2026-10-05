@@ -108,13 +108,24 @@ class Discount extends \Magento\Framework\App\Helper\AbstractHelper
             $this->addChildrenWithPricesToLoadedItems->execute($product->getData('origins_from_collection'));
         }
 
+        if (empty($product->getChildrenWithPrices())) {
+            $this->addChildrenWithPricesToLoadedItems->addChildrenWithPricesToProducts([$product]);
+        }
+
         $childrenProducts = $product->getChildrenWithPrices();
 
         if (!empty($childrenProducts)) {
             return $childrenProducts;
         }
 
-        return $product->getTypeInstance()->getUsedProducts($product);
+        return $this->getEnabledProducts($product->getTypeInstance()->getUsedProducts($product));
+    }
+
+    protected function getEnabledProducts(array $products): array
+    {
+        return array_values(array_filter($products, function ($product) {
+            return (int)$product->getStatus() === \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED;
+        }));
     }
 
     protected function getConfigurableChildProductDiscount(?float $maxConfigurablePrice, \Magento\Catalog\Api\Data\ProductInterface $childProduct): ?int
