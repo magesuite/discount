@@ -130,7 +130,7 @@ class AddChildrenWithPricesToLoadedItems
         $collection = $this->productCollectionFactory->create();
 
         return $collection
-            ->addFieldToFilter($this->optionProvider->getProductEntityLinkField(), ['in' => $productIds])
+            ->addFieldToFilter('entity_id', ['in' => $productIds])
             ->setFlag('children_with_prices_preloaded', true)
             ->addAttributeToSelect($this->attributesToSelect)
             ->addPriceData()
