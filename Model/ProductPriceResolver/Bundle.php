@@ -14,9 +14,9 @@ class Bundle extends ProductPriceResolver implements ProductPriceResolverInterfa
         $productPricesContainer = $this->getProductPricesContainer();
 
         if ($product->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
-            $prices = $this->getPricesForDynamicPriceType($product);
+            $prices = $this->getPricesForDynamicPriceType($product, $finalPrice);
         } else {
-            $prices = $this->getPricesForFixedPriceType($product);
+            $prices = $this->getPricesForFixedPriceType($product, $finalPrice);
         }
 
         $productPricesContainer
@@ -30,9 +30,10 @@ class Bundle extends ProductPriceResolver implements ProductPriceResolverInterfa
      * For the bundle with dynamic price type, discount is a difference between regular price and final price
      *
      * @param $product
+     * @param float|null $finalPrice
      * @return array
      */
-    protected function getPricesForDynamicPriceType($product)
+    protected function getPricesForDynamicPriceType($product, $finalPrice = null)
     {
         if ($product->hasData('final_price') && $product->hasData('price')) {
             $regularPrice = $product->getData('price');
@@ -52,13 +53,14 @@ class Bundle extends ProductPriceResolver implements ProductPriceResolverInterfa
      * For the bundle with fixed price type, discount is a percentage value
      *
      * @param $product
+     * @param float|null $finalPrice
      * @return array
      */
-    protected function getPricesForFixedPriceType($product)
+    protected function getPricesForFixedPriceType($product, $finalPrice = null)
     {
         return [
             'regular_price' => (float)$product->getPrice(),
-            'final_price' => $product->getFinalPrice()
+            'final_price' => $finalPrice ?? $product->getFinalPrice()
         ];
     }
 }
